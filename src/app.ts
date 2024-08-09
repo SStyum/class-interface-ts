@@ -1,120 +1,75 @@
-type Admin = {
-    name: string;
-    privileges: string[];
+const names: string[] = ["Rocha", "Jaque"];
+
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+    return Object.assign(objA, objB);
+}
+
+const mergeObj = merge({ name: "Rocha" }, { age: 30 });
+console.log(mergeObj.age);
+
+interface Lengthy {
+    length: number;
+}
+
+function countAndDescribe<T extends Lengthy> (element: T): [T, string] {
+    let descriptionText = "Got no value";
+    if (element.length === 1){
+        descriptionText = 'Got 1 element.';
+    } else if (element.length > 0){
+        descriptionText = 'Got' + element.length + 'elements.';
+    }
+
+    return [element, descriptionText];
+}
+
+console.log(countAndDescribe('Hi there!'));
+
+function extractAndConvert<T extends object, U extends keyof T> (obj: T, key: U) {
+    return 'Value: ' + obj[key];
 };
 
-type Employee = {
-    name: string;
-    startDate: Date;
-};
+extractAndConvert({ name: 'Rocha' }, 'name');
 
-type ElevatedEmployee = Admin & Employee;
+class DataStorage<T> {
+    private data: T[] = [];
 
-const e1: ElevatedEmployee = {
-    name: "Rocha",
-    privileges: ["To rule them all"],
-    startDate: new Date()
-}
+    addItem (item: T) {
+        this.data.push(item)
+    };
 
-type Combinable = string | number;
-type Numeric = number | boolean;
+    removeItem (item: T) {
+        if (this.data.indexOf(item) === -1) {
+            return;
+        }
+        this.data.splice(this.data.indexOf(item), 1);
+    };
 
-type Universal = Combinable & Numeric;
-
-function Add(a: number, b: number): number
-function Add(a: string, b: string): string
-function Add(a: string, b: number): string
-function Add(a: number, b: string): string
-function Add(a: Combinable, b: Combinable) {
-    if (typeof a === "string" || typeof b === "string") {
-        return a.toString() + b.toString();
-    } else {
-        return a + b;
+    getItems () {
+        return [...this.data];
     }
 }
 
-const result = Add("Rocha", "Jaquelinda");
-result.split(' ');
+const textStorage = new DataStorage<string>();
+textStorage.addItem("Jaquelinda");
+textStorage.addItem("Rocha");
+textStorage.removeItem("Rocha");
+console.log(textStorage.getItems());
 
-const fetchedUserData = {
-    id: "0",
-    userName: "Rocha",
-    job: { title: "CEO", description: "My own company" }
-};
-// optional chainning is the "?" inside log.
-console.log(fetchedUserData?.job?.title);
-
-type UnknownEmployee = Employee | Admin;
-
-function printEmployeeInformation (emp: UnknownEmployee) {
-    console.log("Name: " + emp.name);
-    if ("privileges" in emp) {
-        console.log("Privileges" + emp.privileges);
-    }
-    if ("startDate" in emp) {
-        console.log("Privileges" + emp.startDate);
-    }
+interface CourseGoal {
+    title: string;
+    description: string;
+    completeUntil: Date;
 }
 
-printEmployeeInformation(e1);
-
-class Car {
-    drive() {
-        console.log("Driving a car");
-    }
-}
-
-class Truck {
-    drive() {
-        console.log("Driving a truck");
-    }
-
-    loadCargo() {
-        console.log("Loading cargo...");
-    }
-}
-
-type Vehicle = Car | Truck;
-
-const v1 = new Car();
-const v2 = new Truck();
-
-function useVehicle (vehicle: Vehicle) {
-    vehicle.drive();
-    if (vehicle instanceof Truck) {
-        vehicle.loadCargo();
-    }
-}
-
-interface Bird {
-    type: "bird";
-    flyingSpeed: number;
-}
-
-interface Horse {
-    type: "horse";
-    runningSpeed: number
-}
-
-type Animal = Bird | Horse;
-
-function moveAnimal(animal: Animal) {
-    switch (animal.type) {
-        case "bird":
-            console.log("Flying at speed: " + animal.flyingSpeed);
-            break;
-        case "horse":
-            console.log("Running at speed: " + animal.runningSpeed);
-            break;
-    }
-}
-
-moveAnimal({ type: "horse", runningSpeed: 8 });
-
-interface ErrorContainer {
-    [prop: string]: string;
-}
-
-const errorBag: ErrorContainer = {
-    1: "Not a valid email",
+function createCourseGoal (title: string, description: string, date: Date): CourseGoal  {
+    let courseGoal: Partial<CourseGoal> = {};
+    courseGoal.title = title;
+    courseGoal.description = description;
+    courseGoal.completeUntil = date;
+    return courseGoal as CourseGoal;
+    /* return {
+        title,
+        description,
+        completeUntil: date,
+    }; */
 }
